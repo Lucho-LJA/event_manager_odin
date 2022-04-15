@@ -1,7 +1,7 @@
 puts 'Event Manager Initialized!'
 
 path_file = "event_attendees.csv"
-contents = File.read(path_file)
 if File.exist?(path_file)
-    puts contents
+    contents = File.readlines(path_file)
+    contents.each{|line| puts line}
 end
