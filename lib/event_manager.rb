@@ -2,6 +2,18 @@ require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
 
+def clean_number(name, phone_number)
+    puts "verifying phone number #{phone_number} of #{name}"
+    phone = phone_number.to_s
+    if phone.length == 10
+        puts "\t number #{phone} is correct"
+    elsif phone.length == 11 and phone[0] == "1"
+        puts "\t number #{phone[1..phone.length]} is correct"
+    else
+        puts "\t number #{phone} is incorrect"
+    end   
+end
+
 def save_thank_you_letter(id,form_letter)
     puts "Creating output/thanks_#{id}.html"
     Dir.mkdir('output') unless Dir.exist?('output')
@@ -58,6 +70,11 @@ if File.exist?(path_file) and File.exist?(path_template_letter)
         legislators = legislators_by_zipcode(zipcode)
         form_letter = erb_template.result(binding)
         save_thank_you_letter(id,form_letter)
+        
+        #uncomment the next line to print phone number and verificate  number
+        clean_number(name, row[:homephone])
+
+        
     end
     
     puts "Event Manager Finished!"
