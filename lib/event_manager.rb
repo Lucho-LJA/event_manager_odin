@@ -2,7 +2,16 @@ require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
 
-
+def save_thank_you_letter(id,form_letter)
+    puts "Creating output/thanks_#{id}.html"
+    Dir.mkdir('output') unless Dir.exist?('output')
+  
+    filename = "output/thanks_#{id}.html"
+  
+    File.open(filename, 'w') do |file|
+      file.puts form_letter
+    end
+end
 
 def legislators_by_zipcode(zip)
     civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
@@ -48,12 +57,8 @@ if File.exist?(path_file) and File.exist?(path_template_letter)
         zipcode = clean_zipcode(row[:zipcode])
         legislators = legislators_by_zipcode(zipcode)
         form_letter = erb_template.result(binding)
-
-        Dir.mkdir('output') unless Dir.exist?('output')
-        filename = "output/thanks_#{id}.html"
-        File.open(filename, 'w') do |file|
-            file.puts form_letter
-          end
-
+        save_thank_you_letter(id,form_letter)
     end
+    
+    puts "Event Manager Finished!"
 end
