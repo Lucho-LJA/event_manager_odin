@@ -1,8 +1,7 @@
 require 'csv'
 require 'google/apis/civicinfo_v2'
 
-path_form_letter = 'template_letter.html'
-form_letter = File.read(path_form_letter)
+
 
 def legislators_by_zipcode(zip)
     civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
@@ -28,16 +27,22 @@ end
 puts 'Event Manager Initialized!'
 
 path_file = "event_attendees.csv"
-if File.exist?(path_file)
+path_template_letter = 'template_letter.html'
+
+if File.exist?(path_file) and File.exist?(path_template_letter)
     contest = CSV.open(
         path_file, 
         headers: true,
         header_converters: :symbol
     )
+    template_letter = File.read(path_template_letter)
+
     contest.each do |row|
         name = row[:first_name]
         zipcode = clean_zipcode(row[:zipcode])
         legislators = legislators_by_zipcode(zipcode)
-        puts "#{name}  #{zipcode} #{legislators}"
+        personal_letter = template_letter.gsub('FIRST_NAME', name)
+        personal_letter.gsub!('LEGISLATORS',legislators)
+        puts personal_letter
     end
 end
