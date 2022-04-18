@@ -2,9 +2,33 @@ require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
 
+def transform_number_phone(str_num)
+    if str_num.include?("E+")
+        str_num = str_num.to_f.to_i
+        str_num = str_num.to_s
+    end
+    if str_num.include?("(")
+        str_num.gsub!("(","")
+    end
+    if str_num.include?(")")
+        str_num.gsub!(")","")
+    end
+    if str_num.include?(" ")
+        str_num.gsub!(" ","")
+    end
+    if str_num.include?("-")
+        str_num.gsub!("-","")
+    end
+    if str_num.include?(".")
+        str_num.gsub!(".","")
+    end
+    p str_num
+    str_num
+end
+
 def clean_number(name, phone_number)
     puts "verifying phone number #{phone_number} of #{name}"
-    phone = phone_number.to_s
+    phone = transform_number_phone(phone_number.to_s)
     if phone.length == 10
         puts "\t number #{phone} is correct"
     elsif phone.length == 11 and phone[0] == "1"
