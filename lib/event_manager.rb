@@ -3,9 +3,13 @@ puts 'Event Manager Initialized!'
 
 path_file = "event_attendees.csv"
 if File.exist?(path_file)
-    contest = CSV.open(path_file, headers: true)
+    contest = CSV.open(
+        path_file, 
+        headers: true,
+        header_converters: :symbol
+    )
     contest.each do |row|
-        name = row[2]
+        name = row[:first_name]
         puts name
     end
 end
