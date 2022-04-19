@@ -2,6 +2,23 @@ require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
 require 'time'
+require 'date'
+
+def analize_days(contest)
+    hash_days = Hash.new(0)
+    contest.each do |row|
+        date = Date.strptime(row[:regdate],"%m/%d/%y %H:%M").strftime("%A")
+        hash_days[date] += 1
+    end
+    max_num = hash_days.values.max
+    puts " The day/s that most people registered are: "
+    hash_days.each do |key,value|
+        if value == max_num
+            puts "\t #{key}"
+         end
+    end
+    puts "Whith #{max_num} times"
+end
 
 def analize_hours(contest)
     hash_hours = Hash.new(0)
@@ -111,13 +128,20 @@ if File.exist?(path_file) and File.exist?(path_template_letter)
         #uncomment the next line to print phone number and verificate  number
         clean_number(name, row[:homephone])  
     end
-     #uncomment the next lines to print hours of the day the most people registered
+    #uncomment the next lines to print hours of the day the most people registered
     contest = CSV.open(
         path_file, 
         headers: true,
         header_converters: :symbol
     )
     analize_hours(contest)
+    #uncomment the next lines to print the day of the most people registered
+    contest = CSV.open(
+        path_file, 
+        headers: true,
+        header_converters: :symbol
+    )
+    analize_days(contest)
    
     puts "Event Manager Finished!"
 end
