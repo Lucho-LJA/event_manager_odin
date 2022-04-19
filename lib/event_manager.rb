@@ -1,6 +1,24 @@
 require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
+require 'time'
+
+def analize_hours(contest)
+    hash_hours = Hash.new(0)
+    contest.each do |row|
+        date = Time.strptime(row[:regdate],"%m/%d/%y %H:%M").hour
+        hash_hours[date] += 1
+    end
+    max_num = hash_hours.values.max
+    puts "The hours of the day the most people registered are: "
+    hash_hours.each do |key,value|
+        if value == max_num
+            puts "\t #{key} hours"
+         end
+    end
+    puts "Whith #{max_num} times"
+
+end
 
 def transform_number_phone(str_num)
     if str_num.include?("E+")
@@ -22,7 +40,6 @@ def transform_number_phone(str_num)
     if str_num.include?(".")
         str_num.gsub!(".","")
     end
-    p str_num
     str_num
 end
 
@@ -59,9 +76,6 @@ def legislators_by_zipcode(zip)
         levels: 'country',
         roles: ['legislatorUpperBody', 'legislatorLowerBody']
       ).officials
-      #legislators = legislators.officials
-      #legislator_names = legislators.map(&:name)
-      #legislator_names.join(", ")
 
     rescue
       'You can find your representatives by visiting www.commoncause.org/take-action/find-elected-officials'
@@ -86,7 +100,6 @@ if File.exist?(path_file) and File.exist?(path_template_letter)
     )
     template_letter = File.read(path_template_letter)
     erb_template = ERB.new template_letter
-
     contest.each do |row|
         id = row[0]
         name = row[:first_name]
@@ -96,10 +109,15 @@ if File.exist?(path_file) and File.exist?(path_template_letter)
         save_thank_you_letter(id,form_letter)
         
         #uncomment the next line to print phone number and verificate  number
-        clean_number(name, row[:homephone])
-
-        
+        clean_number(name, row[:homephone])  
     end
-    
+     #uncomment the next lines to print hours of the day the most people registered
+    contest = CSV.open(
+        path_file, 
+        headers: true,
+        header_converters: :symbol
+    )
+    analize_hours(contest)
+   
     puts "Event Manager Finished!"
 end
