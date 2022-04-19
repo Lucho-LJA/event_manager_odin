@@ -124,24 +124,16 @@ if File.exist?(path_file) and File.exist?(path_template_letter)
         legislators = legislators_by_zipcode(zipcode)
         form_letter = erb_template.result(binding)
         save_thank_you_letter(id,form_letter)
-        
         #uncomment the next line to print phone number and verificate  number
         clean_number(name, row[:homephone])  
     end
     #uncomment the next lines to print hours of the day the most people registered
-    contest = CSV.open(
-        path_file, 
-        headers: true,
-        header_converters: :symbol
-    )
+    contest.rewind
     analize_hours(contest)
     #uncomment the next lines to print the day of the most people registered
-    contest = CSV.open(
-        path_file, 
-        headers: true,
-        header_converters: :symbol
-    )
+    contest.rewind
     analize_days(contest)
+    
    
     puts "Event Manager Finished!"
 end
